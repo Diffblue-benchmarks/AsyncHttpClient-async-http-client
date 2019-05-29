@@ -1,0 +1,228 @@
+buildCmd: mvn -e -X -Dmaven.test.skip=true compile
+testCmd: true
+lineLength: 4096
+skipVerification: true
+cbmcArguments:
+  # Do not generate coverage comments on generated tests.
+  java-generate-no-comments: true
+phases:
+  -
+  #Phase 0 PRETTY AND SIMPLE - Simple models, quick cover, pretty Tests, Do Not Test Private Method Directly
+    timeout: 180
+    cbmcArguments:
+      # Use simple models containers (ArrayList, HashMap, HashSet,...) will have a maximum size of one.
+      classpath: '/tools/cbmc/models-simple-overlay.jar:/tools/cbmc/models.jar:.'
+      # Set a limit on the number of instructions that can be generated as part of a test trace.
+      depth: 1500
+      # never initialize reference-typed parameter to the entry point with null
+      java-assume-inputs-non-null: true
+      # Constrain the size of arrays created in the analyzed code.
+      java-max-vla-length: 10000
+      # Maximum allowed length for an array passed as test input.
+      max-nondet-array-length: 10
+      # Bound the length of input strings.
+      max-nondet-string-length: 10
+      # Add constraint that strings are printable
+      string-printable: true
+      # Make implicit runtime exceptions explicit.
+      throw-runtime-exceptions: false
+      # Set an upper bound on loop unwinding.
+      unwind: 1
+      # Do not test any methods that have the specified access level.
+      do-not-test-methods-with-access: [ private ]
+      # Instrument the entry point function only.
+      cover-function-only: false
+      # Instrument the file as opposed to the function only
+      cover-only: file
+      # Set string input value  
+      string-input-value: ["foo", "Bar", "BAZ", "1234", "a,b,c", "1", "2", "3", "a/b/c", "a'b'c"]
+  -
+  #Phase 1 PRETTY AND COMPLEX - Standard models, longer run time, pretty tests, Do Not Test Private Method Directly
+    timeout: 180
+    cbmcArguments:
+      # Use the standard models library
+      classpath: '/tools/cbmc/models.jar:.'
+      # Set a limit on the number of instructions that can be generated as part of a test trace.
+      depth: false
+      # never initialize reference-typed parameter to the entry point with null
+      java-assume-inputs-non-null: false
+      # Constrain the size of arrays created in the analyzed code.
+      java-max-vla-length: 10000
+      # Maximum allowed length for an array passed as test input.
+      max-nondet-array-length: 10
+      # Bound the length of input strings.
+      max-nondet-string-length: 10
+      # Add constraint that strings are printable
+      string-printable: true
+      # Set string input value  
+      string-input-value: ["foo", "Bar", "BAZ", "1234", "a,b,c", "1", "2", "3", "a/b/c", "a'b'c"]
+      # Make implicit runtime exceptions explicit.
+      throw-runtime-exceptions: false
+      # Set an upper bound on loop unwinding.
+      unwind: 2
+      # Do not test any methods that have the specified access level.
+      do-not-test-methods-with-access: [ private ]
+      # Instrument the entry point function only.
+      cover-function-only: false
+      # instrument the file as opposed to the function only
+      cover-only: file
+  -
+  #Phase 2 Simple and Private Directly
+    timeout: 180
+    cbmcArguments:
+      # Use simple models containers (ArrayList, HashMap, HashSet,...) will have a maximum size of one.
+      classpath: '/tools/cbmc/models-simple-overlay.jar:/tools/cbmc/models.jar:.'
+      # Set a limit on the number of instructions that can be generated as part of a test trace.
+      depth: 1500
+      # never initialize reference-typed parameter to the entry point with null
+      java-assume-inputs-non-null: true
+      # Constrain the size of arrays created in the analyzed code.
+      java-max-vla-length: 10000
+      # Maximum allowed length for an array passed as test input.
+      max-nondet-array-length: 10
+      # Bound the length of input strings.
+      max-nondet-string-length: 10
+      # Add constraint that strings are printable
+      string-printable: true
+      # Make implicit runtime exceptions explicit.
+      throw-runtime-exceptions: false
+      # Set an upper bound on loop unwinding.
+      unwind: 1
+      # Set string input value  
+      string-input-value: ["foo", "Bar", "BAZ", "1234", "a,b,c", "1", "2", "3", "a/b/c", "a'b'c"]
+      # If the logs contain output of the following then proceed to phase X
+    nextPhase:
+      # If the function is not analysable then do not pass onto the next phase
+      not_analyzed: null
+  -
+  #Phase 3 Complex and Private Directly
+    timeout: 180
+    cbmcArguments:
+      # Use the standard models library.
+      classpath: '/tools/cbmc/models.jar:.'
+      # Set a limit on the number of instructions that can be generated as part of a test trace.
+      depth: 3000
+      # Constrain the size of arrays created in the analyzed code.
+      java-max-vla-length: 10000
+      # Maximum allowed length for an array passed as test input.
+      max-nondet-array-length: 30
+      # Bound the length of input strings.
+      max-nondet-string-length: 30
+      # Make implicit runtime exceptions explicit.
+      throw-runtime-exceptions: false
+      # Set an upper bound on loop unwinding.
+      unwind: 3
+      # Set string input value  
+      string-input-value: ["foo", "Bar", "BAZ", "1234", "a,b,c", "1", "2", "3", "a/b/c", "a'b'c"]
+  -
+  #Phase 4 EXCEPTIONS
+    timeout: 180
+    cbmcArguments:
+      # Use the standard models library.
+      classpath: '/tools/cbmc/models.jar:.'
+      # Set a limit on the number of instructions that can be generated as part of a test trace.
+      depth: false
+      # Constrain the size of arrays created in the analyzed code.
+      java-max-vla-length: 10000
+      # Maximum allowed length for an array passed as test input.
+      max-nondet-array-length: 30
+      # Bound the length of input strings.
+      max-nondet-string-length: 30
+      # Add constraint that strings are printable
+      string-printable: false
+      # Make implicit runtime exceptions explicit.
+      throw-runtime-exceptions: true
+      # Set an upper bound on loop unwinding.
+  -
+    #PHASE 5 Big numbers and less contraints on inputs 
+    timeout: 300
+    cbmcArguments:
+      # Use the standard models library.
+      classpath: '/tools/cbmc/models.jar:.'
+      # Set a limit on the number of instructions that can be generated as part of a test trace.
+      depth: false
+      # never initialize reference-typed parameter to the entry point with null
+      java-assume-inputs-non-null: false
+      # Constrain the size of arrays created in the analyzed code.
+      java-max-vla-length: 10000
+      # Maximum allowed length for an array passed as test input.
+      max-nondet-array-length: 100
+      # Bound the length of input strings.
+      max-nondet-string-length: 100
+      # Add constraint that strings are printable
+      string-printable: false
+      # Make implicit runtime exceptions explicit.
+      throw-runtime-exceptions: false
+      # Set an upper bound on loop unwinding.
+      unwind: 6
+units:
+ - target:
+   - dir: client/target/classes
+     file: org/asynchttpclient/ntlm/NtlmEngine.class
+     sourceDir: client/src/main/java
+     sourceFile: org/asynchttpclient/ntlm/NtlmEngine.java
+   - dir: client/target/classes
+     file: org/asynchttpclient/ntlm/NtlmEngineException.class
+     sourceDir: client/src/main/java
+     sourceFile: org/asynchttpclient/ntlm/NtlmEngineException.java
+   - dir: client/target/classes
+     file: org/asynchttpclient/ntlm/NtlmEngine$NTLMMessage.class
+     sourceDir: client/src/main/java
+     sourceFile: org/asynchttpclient/ntlm/NtlmEngine.java
+   - dir: client/target/classes
+     file: org/asynchttpclient/ntlm/NtlmEngine$CipherGen.class
+     sourceDir: client/src/main/java
+     sourceFile: org/asynchttpclient/ntlm/NtlmEngine.java
+   - dir: client/target/classes
+     file: org/asynchttpclient/ntlm/NtlmEngine$HMACMD5.class
+     sourceDir: client/src/main/java
+     sourceFile: org/asynchttpclient/ntlm/NtlmEngine.java
+   - dir: client/target/classes
+     file: org/asynchttpclient/ntlm/NtlmEngine$Type1Message.class
+     sourceDir: client/src/main/java
+     sourceFile: org/asynchttpclient/ntlm/NtlmEngine.java
+   - dir: client/target/classes
+     file: org/asynchttpclient/ntlm/NtlmEngine$Type3Message.class
+     sourceDir: client/src/main/java
+     sourceFile: org/asynchttpclient/ntlm/NtlmEngine.java
+   - dir: client/target/classes
+     file: org/asynchttpclient/ntlm/NtlmEngine$Type2Message.class
+     sourceDir: client/src/main/java
+     sourceFile: org/asynchttpclient/ntlm/NtlmEngine.java
+   - dir: client/target/classes
+     file: org/asynchttpclient/ntlm/NtlmEngine$MD4.class
+     sourceDir: client/src/main/java
+     sourceFile: org/asynchttpclient/ntlm/NtlmEngine.java
+ - target:
+   - dir: client/target/classes
+     file: org/asynchttpclient/util/HttpUtils.class
+     sourceDir: client/src/main/java
+     sourceFile: org/asynchttpclient/util/HttpUtils.java
+   - dir: client/target/classes
+     file: org/asynchttpclient/Param.class
+     sourceDir: client/src/main/java
+     sourceFile: org/asynchttpclient/Param.java
+   - dir: client/target/classes
+     file: org/asynchttpclient/util/StringUtils.class
+     sourceDir: client/src/main/java
+     sourceFile: org/asynchttpclient/util/StringUtils.java
+   - dir: client/target/classes
+     file: org/asynchttpclient/Request.class
+     sourceDir: client/src/main/java
+     sourceFile: org/asynchttpclient/Request.java
+   - dir: client/target/classes
+     file: org/asynchttpclient/util/Utf8UrlEncoder.class
+     sourceDir: client/src/main/java
+     sourceFile: org/asynchttpclient/util/Utf8UrlEncoder.java
+   - dir: client/target/classes
+     file: org/asynchttpclient/util/StringBuilderPool.class
+     sourceDir: client/src/main/java
+     sourceFile: org/asynchttpclient/util/StringBuilderPool.java
+   - dir: client/target/classes
+     file: org/asynchttpclient/AsyncHttpClientConfig.class
+     sourceDir: client/src/main/java
+     sourceFile: org/asynchttpclient/AsyncHttpClientConfig.java
+   - dir: client/target/classes
+     file: org/asynchttpclient/uri/Uri.class
+     sourceDir: client/src/main/java
+     sourceFile: org/asynchttpclient/uri/Uri.java
