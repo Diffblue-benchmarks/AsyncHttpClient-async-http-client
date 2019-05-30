@@ -226,3 +226,14 @@ units:
      file: org/asynchttpclient/uri/Uri.class
      sourceDir: client/src/main/java
      sourceFile: org/asynchttpclient/uri/Uri.java
+  - target:
+    - dir: netty-utils/target/classes
+      file: org/asynchttpclient/netty/util/ByteBufUtils.class
+      sourceDir: netty-utils/src/main/java
+      sourceFile: org/asynchttpclient/netty/util/ByteBufUtils.java
+    # Child of ByteBufUtils.class
+    # Child Coverage: Unknown %
+    - dir: netty-utils/target/classes
+      file: org/asynchttpclient/netty/util/Utf8ByteBufCharsetDecoder.class
+      sourceDir: netty-utils/src/main/java
+      sourceFile: org/asynchttpclient/netty/util/Utf8ByteBufCharsetDecoder.java
